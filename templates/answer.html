@@ -1,0 +1,231 @@
+{% extends "bootstrap/base.html" %}
+{% import "bootstrap/fixes.html" as fixes %}
+
+{% block title %}Answer{% endblock %}
+
+{% block content %}
+
+<!-- Load jQuery -->
+<script src="https://code.jquery.com/jquery-2.2.3.min.js"></script>
+
+<!-- Custom styles for this template -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/jumbotron.css') }}">
+
+<div class="jumbotron" style="background-color:#4682B4">
+  <div class="container">
+
+    <div class="row">
+
+      <div class="col-xs-6 col-sm-6">
+
+        <!-- Panel showing number of articles -->
+        <div id="stats-panel">
+          <h3 id="question-name"></h3>
+          
+          <div class="summary" id="total">
+            <p class="subhead" id="total-sub"></p> 
+          </div>
+
+          <div class="summary" id="relevant">
+            <p class="subhead" id="relevant-sub"></p> 
+          </div>
+
+          <div class="summary" id="for">
+            <p class="subhead" id="for-sub"></p>                       
+          </div>
+
+          <div class="summary" id="against">
+            <p class="subhead" id="against-sub"></p>                       
+          </div>
+
+          <div class="summary" id="no-position">
+            <p class="subhead" id="no-position-sub"></p>                       
+          </div>
+          
+        </div>
+
+        <script>
+          var question = {{ question|tojson }};
+
+          var answer = {{ answer|tojson }};
+
+          var allNum = {{ answer.All_articles|tojson }};
+
+          var relevantNum = {{ answer.Relevant_articles|tojson }};
+
+          var forNum = {{ answer.Claim_positions.Yes|tojson }};
+          
+          var againstNum = {{ answer.Claim_positions.No|tojson }};
+
+          var noPositionNum = {{ answer.Claim_positions.No_position|tojson }};
+
+          $( function() {
+            // Show summary numbers
+            $('#question-name').text('Question: '+ question);
+            $('#total-sub').text('Total number of articles retrieved: ' + allNum);
+            $('#relevant-sub').text('Number of relevant articles: ' + relevantNum);
+            $('#for-sub').text('Articles in favor of the policy: ' + forNum);
+            $('#against-sub').text('Articles against the policy: ' + againstNum);
+            $('#no-position-sub').text('Articles with no explicit position: ' + noPositionNum);
+            }
+          );
+        </script>
+
+        <!-- Chart showing summary stats -->
+        <div id="graph-wrapper">
+          <div id="summary-chart"></div>
+        </div>
+
+        <script>
+          var forNumPercentage = {{ answer.Claim_positions.Yes_percent|tojson }};
+
+          var againstNumPercentage = {{ answer.Claim_positions.No_percent|tojson }};
+
+          var noPositionNumPercentage = {{ answer.Claim_positions.No_position_percent|tojson }};
+
+          if (forNumPercentage !== 'N/A') {
+
+            Highcharts.chart('summary-chart', {
+              chart: {
+                  plotBackgroundColor: null,
+                  plotBorderWidth: null,
+                  plotShadow: false,
+                  type: 'pie'
+              },
+              title: {
+                  text: 'RELEVANT PAPERS TAKING A GIVEN POSITION'
+              },
+              tooltip: {
+                  pointFormat: '<b>{point.percentage:.1f}%</b>'
+              },
+              plotOptions: {
+                  pie: {
+                      allowPointSelect: true,
+                      cursor: 'pointer',
+                      dataLabels: {
+                          enabled: false,
+                          format: '<b>{point.percentage:.1f}</b>%'
+                      },
+                      showInLegend: true
+                  }
+              },
+              series: [{
+                  name: '',
+                  colorByPoint: true,
+                  data: [{
+                      name: 'For',
+                      y: forNumPercentage
+                  }, {
+                      name: 'Against',
+                      y: againstNumPercentage
+                  }, {
+                      name: 'No position',
+                      y: noPositionNumPercentage
+                  }]
+              }]
+            });
+          }
+        </script>
+
+        <!-- Recommendation for the user -->
+        <div id="recommendation">
+          <h3 id="recommendation-title"></h3>
+          <div class="recommendation-text" id="recommendation-words">
+            <p class="subhead" id="recommendation-sub"></p> 
+          </div>
+        </div>
+
+        <script>
+          var detailedRecommendation = {{ answer.Claim_positions.detailed_recommendation|tojson }};
+
+          $( function() {
+            // Show the recommendation
+            $('#recommendation-title').text('Recommendation');
+            $('#recommendation-sub').text(detailedRecommendation);
+            }
+          );
+        </script>
+
+      </div>
+
+      <div class="col-xs-6 col-sm-6">
+
+        <!-- Wikipedia policy summary-->
+        <div id="wiki-policy-summary">
+          <h3 id="wiki-policy-summary-title"></h3>
+          <div class="wiki-policy-summary-title-text" id="wiki-policy-summary-title-words"></div>
+          <div class="text">
+            <center>
+            <p>  
+              Source: Wikipedia.
+            </p>
+            </center>      
+          </div>
+        </div>
+
+        <script>
+          var summary_policy = {{ summary_policy|tojson }};
+
+          $ (function() {
+            // Show the recommendation
+            $('#wiki-policy-summary-title').text('Policy Summary');
+           
+            // Show summary of policy definition
+            $('#wiki-policy-summary-title-words').text(summary_policy);
+            }
+          );
+        </script>
+
+        <!-- Wikipedia consequence summary-->
+        <div id="wiki-consequence-summary">
+          <h3 id="wiki-consequence-summary-title"></h3>
+          <div class="wiki-consequence-summary-title-text" id="wiki-consequence-summary-title-words"></div>
+          <div class="text">
+            <center>
+            <p>  
+              Source: Wikipedia.
+            </p>
+            </center>      
+          </div>
+        </div>
+
+        <script>
+          var summary_consequence = {{ summary_consequence|tojson }};
+
+          $ (function() {
+            // Show the recommendation
+            $('#wiki-consequence-summary-title').text('Consequence Summary');
+           
+            // Show summary of policy definition
+            $('#wiki-consequence-summary-title-words').text(summary_consequence);
+            }
+          );
+        </script>
+ 
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<!-- Footer for the entire page -->
+<div id="footer" class="text">
+  <center>
+  <p>  
+    The open access research papers used in generating this data were obtained using the <a href="https://doaj.org/">DOAJ</a>, <a href="https://www.crossref.org/">Crossref</a>, and <a href="https://core.ac.uk/">CORE</a> APIs.
+  </p>
+  <br>
+  <p>
+    Copyright (c) 2019 Pollicy.
+  </p>
+  </center>      
+</div>
+
+{% endblock %}
+
+{% block head %}
+{{super()}}
+{{fixes.ie8()}}
+{% endblock %}
