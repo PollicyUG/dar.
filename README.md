@@ -51,13 +51,13 @@ In one terminal, start the redis server by running:
 redis-server
 ```
 
-In a second terminal, change into the Policy-Question-Answering-System directory, activate the virtual environemnt, and start the celery workers by running:
+In a second terminal, change into the Policy-Question-Answering-System directory, activate the virtual environment, and start the celery workers by running:
 
 ```
 celery worker -A answer_policy_question.celery -O fair
 ```
 
-In a third terminal, change into the Policy-Question-Answering-System directory, activate the virtual environemnt, and start your application by running:
+In a third terminal, change into the Policy-Question-Answering-System directory, activate the virtual environment, and start your application by running:
 
 ```
 python app.py.
@@ -95,6 +95,7 @@ Because this application uses Heroku addons, we need to create those first. In o
 ```
 heroku addons:create heroku-redis:hobby-dev
 ```
+
 This will automatically set the REDIS_URL configuration variable for our application but we also need to set up our SECRET_KEY configuration variable. We do this by running:
 
 ```
@@ -130,6 +131,37 @@ then you will have to add
 ```
 https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-2.1.0/en_core_web_sm- 2.1.0.tar.gz#egg=en_core_web_sm
 ```
-to your requirements.txt. This ensures that the required spaCy model is loaded.
+to your requirements.txt. This ensures that the required spaCy model is loaded. If this causes a 'Double requirement given' error upon deployment, look for
+
+```
+en-core-web-sm=='x.x.x'
+```
+
+in your requirements.txt file and delete it.
+
+# References 
+
+Bing Liu, Minqing Hu and Junsheng Cheng. "Opinion Observer: Analyzing and Comparing Opinions on the Web." Proceedings of the 14th International World Wide Web conference (WWW-2005), May 10-14, 2005, Chiba, Japan.
 
 # TODO
+
+## Front-End
+
+### Chatbot UI
+
+At the moment, the chatbot assumes that the user provides very specific replies rather than full sentences. For example, when the bot asks 'What policy would you like to research today?', it expects a straight answer like 'cap and trade' rather than 'I would like to research cap and trade'. The same applies to the question 'And what effect of cap and trade on carbon emissions are you interested in?' where we expect an answer like 'carbon emissions' rather than 'I would like to know its effect on carbon emissions'. The reason for this is that the user's replies are being handled using JavaScript in the HTML files that render the page and thus there is no way to apply natural language processing techniques to automatically identify the policy or phenomenon of interest from full sentence replies. I have not yet figured out a way to do the processing of full sentence replies from the backend while maintaining a conversational flow but I believe this can be done.
+
+Another possible improvement is moving all the JavaScript code that is in the HTML files to the JavaScript folder in the static directory. The recommended practice is that JavaScript and HTML code should not me mixed.
+
+## Back-End
+
+### Duplicates
+
+Since we are fetching abstracts from three APIs, there is a chance of the same abstract appearing more than once in our results. It would be a good idea if these duplicates could be removed but some times, an extra character or space in the duplicate essentailly makes the two versions of the abstract different. I think one could use regex to clean up the abstracts and then be able to identify the duplicates.
+
+
+### Claim detection
+
+At the moment, the claim detection algorithm is still a work in progress and could be improved durther for better results.
+
+

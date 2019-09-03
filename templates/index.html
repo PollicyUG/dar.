@@ -151,15 +151,12 @@
           }).then(function () {
               replies['question'] = 'Does ' + replies['policy'] + ' ' + replies['direction'] + ' ' + replies['phenomenon'] + '?'
               console.log(replies) 
-              return botui.message.add({
-                loading:true
-              });
-          }).then(function (index) {
-            // start the asynchronous task
-            var url = "{{ url_for('backgroundtask') }}";
-            var data = replies
-            
-            $.ajax({
+
+              // start the asynchronous task
+              var url = "{{ url_for('backgroundtask') }}";
+              var data = replies
+              
+              $.ajax({
               type: "POST",
               url: url,
               contentType: "application/json; charset=utf-8",
@@ -172,13 +169,6 @@
                 update_progress(status_url) 
               }
             });
-            
-            /**
-            botui.message.update(index, {
-              loading: false,
-              content: 'Shown below are the results for your question.'
-            });
-            **/
           });
 
           function update_progress(status_url) {
@@ -233,7 +223,7 @@
 <div id="footer" class="text">
   <center>
   <p>
-    (c) 2019 Pollicy.
+    Copyright (c) 2019 Pollicy.
   </p>
   </center>      
 </div>
